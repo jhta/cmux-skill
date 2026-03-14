@@ -80,6 +80,55 @@ else
   echo "   $SOURCE_LINE"
 fi
 
+# ── Claude Code hooks ─────────────────────────────────────────────────────────
+HOOKS_DIR="$HOME/.claude/hooks"
+SETTINGS="$HOME/.claude/settings.json"
+
+mkdir -p "$HOOKS_DIR"
+
+setup_hook() {
+  local name="$1"      # e.g. stop
+  local event="$2"     # e.g. Stop
+  local hook_file="$HOOKS_DIR/cmux-${name}.sh"
+
+  if [[ -f "$hook_file" ]]; then
+    echo "✓ Hook $event already exists"
+    return
+  fi
+
+  cat > "$hook_file" <<HOOKEOF
+#!/usr/bin/env bash
+if [[ -S "\${CMUX_SOCKET_PATH:-/tmp/cmux.sock}" ]]; then
+    cat | cmux claude-hook ${name} > /dev/null 2>&1 &
+fi
+exit 0
+HOOKEOF
+  chmod +x "$hook_file"
+
+  # Inject into settings.json if not already present
+  if command -v jq &>/dev/null; then
+    if [[ ! -f "$SETTINGS" ]]; then
+      echo '{}' > "$SETTINGS"
+    fi
+    if ! jq -e ".hooks.${event}" "$SETTINGS" &>/dev/null; then
+      tmp=$(mktemp)
+      jq ".hooks.${event} = [{\"matcher\": \"*\", \"hooks\": [{\"type\": \"command\", \"command\": \"${hook_file}\"}]}]" \
+        "$SETTINGS" > "$tmp" && mv "$tmp" "$SETTINGS"
+      echo "→ Registered $event hook in settings.json"
+    else
+      echo "⚠️  $event hook already in settings.json — add manually if needed:"
+      echo "   $hook_file"
+    fi
+  else
+    echo "⚠️  jq not found — add hook manually to ~/.claude/settings.json:"
+    echo "   $hook_file"
+  fi
+}
+
+setup_hook "stop"          "Stop"
+setup_hook "session-start" "SessionStart"
+setup_hook "notification"  "Notification"
+
 # ── Git delta config ──────────────────────────────────────────────────────────
 echo "→ Configuring git to use delta..."
 git config --global core.pager delta

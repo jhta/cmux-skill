@@ -102,7 +102,24 @@ cmux-split right "vim <file1>"
 cmux-split right "vim <file2>"
 ```
 
-### 5. Check Workspace State
+### 5. Notifications
+
+cmux has native Claude Code hook support. When the install script has run, cmux automatically updates the workspace UI on these events:
+
+| Hook | When | cmux command |
+|---|---|---|
+| `Stop` | Claude finishes a response | `cmux claude-hook stop` |
+| `SessionStart` | New Claude session begins | `cmux claude-hook session-start` |
+| `Notification` | Claude sends a background notification | `cmux claude-hook notification` |
+
+To send a manual notification at the end of a long task:
+```bash
+cmux notify --title "Done" --body "Build complete"
+# or via helper:
+cmux-done "Tests passed"
+```
+
+### 6. Check Workspace State
 
 ```bash
 # List open workspaces
@@ -110,9 +127,6 @@ cmux list-workspaces
 
 # Read what's currently on screen in this pane
 cmux read-screen
-
-# Send a notification when a long task finishes
-cmux notify --title "Build Complete" --body "Build finished successfully"
 ```
 
 ## How to Execute Panel Splits

@@ -28,6 +28,7 @@ This will:
 - Clone the skill into `~/.claude/skills/cmux`
 - Add helper functions to your `~/.zshrc` / `~/.bashrc`
 - Configure **git** to use delta with side-by-side, line numbers, and dark mode
+- Wire up **Claude Code hooks** so cmux gets notified when Claude starts, stops, or sends a notification
 - Reload your shell so helpers are immediately available
 
 ### Manual installation
