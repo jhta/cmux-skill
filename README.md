@@ -19,7 +19,7 @@ Say things like:
 ### One-liner
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jhta/cmux-skill/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jhta/cmux-skill/main/install.sh | bash && source ~/.zshrc
 ```
 
 This will:
@@ -28,11 +28,7 @@ This will:
 - Clone the skill into `~/.claude/skills/cmux`
 - Add helper functions to your `~/.zshrc` / `~/.bashrc`
 - Configure **git** to use delta with side-by-side, line numbers, and dark mode
-
-After install, reload your shell:
-```bash
-source ~/.zshrc
-```
+- Reload your shell so helpers are immediately available
 
 ### Manual installation
 
