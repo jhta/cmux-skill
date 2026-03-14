@@ -14,28 +14,51 @@ Say things like:
 | "start the dev server" | Opens a right panel with your dev server running |
 | "open both files side by side" | Two `nvim` panels side by side |
 
-## Requirements
-
-- [cmux](https://www.cmux.dev/) (native macOS terminal)
-- [Neovim](https://neovim.io/) (`brew install neovim`)
-- [delta](https://dandavison.github.io/delta/) for pretty diffs (`brew install git-delta`)
-- Claude Code running inside a cmux workspace
-
 ## Installation
 
-### 1. Clone into your Claude skills directory
+### One-liner
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jhta/cmux-skill/main/install.sh | bash
+```
+
+This will:
+- Install **Neovim** and **delta** via Homebrew (if not already installed)
+- Symlink the **cmux CLI**
+- Clone the skill into `~/.claude/skills/cmux`
+- Add helper functions to your `~/.zshrc` / `~/.bashrc`
+- Configure **git** to use delta with side-by-side, line numbers, and dark mode
+
+After install, reload your shell:
+```bash
+source ~/.zshrc
+```
+
+### Manual installation
+
+<details>
+<summary>Step-by-step</summary>
+
+#### 1. Requirements
+
+- [cmux](https://www.cmux.dev/) (native macOS terminal)
+- [Neovim](https://neovim.io/) — `brew install neovim`
+- [delta](https://dandavison.github.io/delta/) — `brew install git-delta`
+- Claude Code running inside a cmux workspace
+
+#### 2. Clone into your Claude skills directory
 
 ```bash
 git clone https://github.com/jhta/cmux-skill ~/.claude/skills/cmux
 ```
 
-### 2. Symlink the cmux CLI (if not done yet)
+#### 3. Symlink the cmux CLI
 
 ```bash
 sudo ln -sf "/Applications/cmux.app/Contents/Resources/bin/cmux" /usr/local/bin/cmux
 ```
 
-### 3. (Optional) Source the helper functions in your shell
+#### 4. Source the helper functions in your shell
 
 Add to `~/.zshrc` or `~/.bashrc`:
 
@@ -43,15 +66,24 @@ Add to `~/.zshrc` or `~/.bashrc`:
 source ~/.claude/skills/cmux/scripts/cmux-helpers.sh
 ```
 
-This gives you `cmux-split`, `cmux-vim`, `cmux-diff`, `cmux-show`, etc. directly in your terminal.
+#### 5. Configure delta as your git pager
 
-### 4. Enable socket access in cmux
+```bash
+git config --global core.pager delta
+git config --global interactive.diffFilter "delta --color-only"
+git config --global delta.navigate true
+git config --global delta.dark true
+git config --global delta.side-by-side true
+git config --global delta.line-numbers true
+git config --global merge.conflictstyle diff3
+git config --global diff.colorMoved default
+```
 
-cmux Settings → Security → Socket API → set to **"cmux processes only"** (default).
+#### 6. Enable socket access in cmux
 
-### 5. Run Claude Code from inside cmux
+cmux Settings → Security → Socket API → **"cmux processes only"** (default).
 
-This ensures `CMUX_SOCKET_PATH`, `CMUX_WORKSPACE_ID`, and `CMUX_SURFACE_ID` are set so Claude can control your panels.
+</details>
 
 ## Shell helpers
 
@@ -82,21 +114,6 @@ cmux send --surface surface:3 "nvim src/index.ts
 ```
 
 The `cmux-split` helper wraps both steps into one call.
-
-## Delta git config
-
-For best diff output, configure delta as your git pager:
-
-```bash
-git config --global core.pager delta
-git config --global interactive.diffFilter "delta --color-only"
-git config --global delta.navigate true
-git config --global delta.dark true
-git config --global delta.side-by-side true
-git config --global delta.line-numbers true
-git config --global merge.conflictstyle diff3
-git config --global diff.colorMoved default
-```
 
 ## File structure
 
